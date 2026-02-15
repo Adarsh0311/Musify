@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import './App.css'
 import type { MusicTrack } from './types';
 import { PlayerProvider } from './context/PlayerContext';
@@ -9,30 +9,77 @@ import { Search, ChevronLeft, ChevronRight, Upload } from 'lucide-react';
 
 function MusifyApp() {
   const [songs, setSongs] = useState<MusicTrack[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
-  const fetchSongs = () => {
+  // Pagination & Search State
+  const [nextToken, setNextToken] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [hasMore, setHasMore] = useState(true);
+
+  // Observer for infinite scroll
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastSongElementRef = useCallback((node: HTMLDivElement) => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        setNextToken((prevToken) => prevToken); // Trigger re-fetch logic if needed, or call fetch directly
+        fetchSongs(nextToken, searchQuery);
+      }
+    });
+
+    if (node) observer.current.observe(node);
+  }, [loading, hasMore, nextToken, searchQuery]);
+
+  // Debounce Search
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      // Reset and fetch when search query changes
+      setSongs([]);
+      setNextToken(null);
+      setHasMore(true);
+      fetchSongs(null, searchQuery);
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
+  const fetchSongs = (token: string | null, query: string) => {
     setLoading(true);
-    fetch('http://localhost:8080/api/musictrack')
+    // Note: In strict mode, double invocation might cause duplicate appends if not careful.
+    // For production, we'd use a dedicated library like TanStack Query.
+
+    // Check if we are already loading to prevent race conditions (simple check)
+    // Actually, `loading` state updates are async, so we might need a ref or better logic.
+    // simpler: rely on `useEffect` deps or manual calls.
+
+    fetch(`http://localhost:8080/api/musictrack?limit=20${token ? `&nextToken=${token}` : ''}${query ? `&search=${encodeURIComponent(query)}` : ''}`)
       .then(res => res.json())
       .then(data => {
-        setSongs(data);
+        setSongs(prev => {
+          // If token is null (first page), replace. Else append.
+          if (!token) return data.items;
+          // Deduplicate based on s3Key just in case
+          const newItems = data.items.filter((item: MusicTrack) => !prev.some(p => p.s3Key === item.s3Key));
+          return [...prev, ...newItems];
+        });
+        setNextToken(data.nextToken);
+        setHasMore(!!data.nextToken);
         setLoading(false);
       })
       .catch(err => {
-        console.error("Java API is down!", err);
+        console.error("API Error", err);
         setLoading(false);
       });
   };
 
-  // Fetch data from Spring Boot
-  useEffect(() => {
-    fetchSongs();
-  }, []);
-
   const handleUploadSuccess = () => {
-    fetchSongs();
+    setSongs([]);
+    setNextToken(null);
+    setHasMore(true);
+    fetchSongs(null, '');
   };
 
   return (
@@ -57,7 +104,9 @@ function MusifyApp() {
             <input
               type="search"
               className="search-input"
-              placeholder="What do you want to play?"
+              placeholder="Search or Paste URL"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
@@ -82,13 +131,16 @@ function MusifyApp() {
 
         {/* Grid Layout */}
         <div className="song-grid">
-          {loading ? (
-            <p className="text-secondary">Loading your music...</p>
-          ) : (
-            songs.map(song => (
-              <SongCard key={song.s3Key} track={song} />
-            ))
-          )}
+          {songs.map((song, index) => {
+            if (songs.length === index + 1) {
+              return <div ref={lastSongElementRef} key={song.s3Key}><SongCard track={song} /></div>
+            } else {
+              return <SongCard key={song.s3Key} track={song} />
+            }
+          })}
+
+          {loading && <p className="text-secondary">Loading...</p>}
+          {!loading && songs.length === 0 && <p className="text-secondary">No songs found.</p>}
         </div>
       </div>
 
