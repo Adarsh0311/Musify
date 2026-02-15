@@ -1,0 +1,52 @@
+:root {
+  /* Off-white / Grayish Theme */
+  --color-bg-primary: #f5f5f5;
+  /* Light Gray Main Background */
+  --color-bg-secondary: #ffffff;
+  /* White Sidebar/Cards */
+  --color-bg-elevated: #e0e0e0;
+  /* Slightly darker for inputs/hovers */
+  --color-accent: #1db954;
+  /* Keep Green Accent */
+  --color-accent-hover: #1ed760;
+  --color-text-primary: #121212;
+  /* Dark Text */
+  --color-text-secondary: #555555;
+  /* Gray Text */
+  --color-border: #d1d1d1;
+  /* Light Gray Borders */
+
+  --font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}

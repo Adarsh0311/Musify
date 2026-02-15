@@ -1,0 +1,18 @@
+# General
+.DS_Store
+.vscode/
+.idea/
+*.log
+
+# Backend (Java/Maven)
+musify-backend/target/
+musify-backend/.mvn/wrapper/maven-wrapper.properties
+musify-backend/mvnw
+musify-backend/mvnw.cmd
+musify-backend/**/*.class
+
+# Frontend (Node/React)
+musify-frontend/node_modules/
+musify-frontend/dist/
+musify-frontend/build/
+musify-frontend/.env.local
