@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Upload } from 'lucide-react';
 import { getUploadUrl, uploadToS3, saveMetadata } from '../services/api';
+import { parseBlob } from 'music-metadata-browser';
 
 interface UploadModalProps {
     onClose: () => void;
@@ -15,10 +16,26 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadSucce
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0]);
+            console.log("File selected, ", e.target.files[0]);
+            const selectedFile = e.target.files[0];
+            setFile(selectedFile);
             setError('');
+
+            try {
+                const metadata = await parseBlob(selectedFile);
+                console.log("Metadata extracted:", metadata);
+                if (metadata.common.artist) {
+                    setArtistName(metadata.common.artist);
+                }
+                if (metadata.common.title) {
+                    setSongName(metadata.common.title);
+                }
+            } catch (err) {
+                console.warn("Failed to extract metadata:", err);
+                // Non-blocking error, user can still manually enter details
+            }
         }
     };
 
@@ -61,7 +78,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onClose, onUploadSucce
             const { s3Key, uploadUrl } = await getUploadUrl(artistName, songName);
 
             // 3. Upload to S3
-            setMessage('Uploading file to S3...');
+            setMessage('Uploading file...');
             await uploadToS3(uploadUrl, file);
 
             // 4. Save Metadata

@@ -27,6 +27,12 @@ public class MusicTrackRepository {
     }
 
     public MusicTrack save(MusicTrack musicTrack) {
+        if (musicTrack.getArtistName() != null) {
+            musicTrack.setArtistNameLower(musicTrack.getArtistName().toLowerCase());
+        }
+        if (musicTrack.getSongName() != null) {
+            musicTrack.setSongNameLower(musicTrack.getSongName().toLowerCase());
+        }
         musicTrackTable.putItem(musicTrack);
         return musicTrack;
     }
@@ -61,10 +67,10 @@ public class MusicTrackRepository {
 
         // 2. Handle Search Filter
         if (searchQuery != null && !searchQuery.isEmpty()) {
-            String query = searchQuery.trim();
-            // Filter: contains(artistName, query) OR contains(songName, query)
+            String query = searchQuery.trim().toLowerCase();
+            // Filter: contains(artistNameLower, query) OR contains(songNameLower, query)
             Expression expression = Expression.builder()
-                    .expression("contains(artistName, :q) OR contains(songName, :q)")
+                    .expression("contains(artistNameLower, :q) OR contains(songNameLower, :q)")
                     .putExpressionValue(":q", AttributeValue.builder().s(query).build())
                     .build();
             requestBuilder.filterExpression(expression);
@@ -100,6 +106,12 @@ public class MusicTrackRepository {
     }
 
     public MusicTrack updateSong(MusicTrack musicTrack) {
+        if (musicTrack.getArtistName() != null) {
+            musicTrack.setArtistNameLower(musicTrack.getArtistName().toLowerCase());
+        }
+        if (musicTrack.getSongName() != null) {
+            musicTrack.setSongNameLower(musicTrack.getSongName().toLowerCase());
+        }
         musicTrackTable.putItem(musicTrack);
         return musicTrack;
     }

@@ -122,12 +122,12 @@ export function PlayerBar() {
             </div>
 
             {/* 3. Volume / Extra Controls */}
-            <div className="volume-controls">
+            {/* <div className="volume-controls">
                 <Volume2 size={20} className="text-secondary" />
                 <div className="progress-bar" style={{ width: '100px' }}>
                     <div className="progress-fill" style={{ width: '50%' }}></div>
                 </div>
-            </div>
+            </div> */}
 
         </footer>
     );
