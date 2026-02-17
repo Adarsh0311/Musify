@@ -49,19 +49,24 @@ public class MusicTrackRepository {
         // 1. Handle Pagination (NextToken)
         if (nextToken != null && !nextToken.isEmpty()) {
             try {
-                // In a real app, nextToken would be a Base64 encoded JSON map.
-                // For this demo, and due to complexity of manual deserialization without helper
-                // utils, we will skip *decoding* for now and rely on client state or simplified
-                // flow.
-                // To do this properly requires importing Jackson or Gson and mapping Json ->
-                // Map<String, AttributeValue>.
+                // Decode Base64 -> JSON String -> Map<String, AttributeValue>
+                // For simplicity in this demo, we'll assume nextToken is PartitionKey#SortKey
+                // string
+                // format for now?
+                // No, better to try to reconstruct the key.
+                // Since our PK is artistName and SK is songName, we need both.
+                // Let's rely on a simple custom format: "ArtistName|SongName" encoded in Base64
 
-                // NOTE: For the purpose of this portfolio, we will perform a standard scan.
-                // If the user wants true stateless pagination, we'd need that decoder.
-
-                // Let's implement Filter instead, which is more important for "Search".
+                String decoded = new String(Base64.getDecoder().decode(nextToken));
+                String[] parts = decoded.split("\\|", 2);
+                if (parts.length == 2) {
+                    Map<String, AttributeValue> startKey = new HashMap<>();
+                    startKey.put("artistName", AttributeValue.builder().s(parts[0]).build());
+                    startKey.put("songName", AttributeValue.builder().s(parts[1]).build());
+                    requestBuilder.exclusiveStartKey(startKey);
+                }
             } catch (Exception e) {
-                // ignore
+                // ignore invalid token
             }
         }
 
@@ -90,10 +95,15 @@ public class MusicTrackRepository {
             Page<MusicTrack> page = iterator.next();
             items.addAll(page.items());
 
-            // Map<String, AttributeValue> lastKey = page.lastEvaluatedKey();
-            // if (lastKey != null && !lastKey.isEmpty()) {
-            // newNextToken = ... serialize lastKey ...
-            // }
+            Map<String, AttributeValue> lastKey = page.lastEvaluatedKey();
+            if (lastKey != null && !lastKey.isEmpty()) {
+                AttributeValue artistAttr = lastKey.get("artistName");
+                AttributeValue songAttr = lastKey.get("songName");
+                if (artistAttr != null && songAttr != null) {
+                    String rawToken = artistAttr.s() + "|" + songAttr.s();
+                    newNextToken = Base64.getEncoder().encodeToString(rawToken.getBytes());
+                }
+            }
         }
 
         return new PaginatedResponse(items, newNextToken);

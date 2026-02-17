@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 import type { MusicTrack } from './types';
 import { PlayerProvider } from './context/PlayerContext';
@@ -17,21 +17,7 @@ function MusifyApp() {
   const [searchQuery, setSearchQuery] = useState('');
   const [hasMore, setHasMore] = useState(true);
 
-  // Observer for infinite scroll
-  const observer = useRef<IntersectionObserver | null>(null);
-  const lastSongElementRef = useCallback((node: HTMLDivElement) => {
-    if (loading) return;
-    if (observer.current) observer.current.disconnect();
 
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore) {
-        setNextToken((prevToken) => prevToken); // Trigger re-fetch logic if needed, or call fetch directly
-        fetchSongs(nextToken, searchQuery);
-      }
-    });
-
-    if (node) observer.current.observe(node);
-  }, [loading, hasMore, nextToken, searchQuery]);
 
   // Debounce Search
   useEffect(() => {
@@ -48,14 +34,18 @@ function MusifyApp() {
 
   const fetchSongs = (token: string | null, query: string) => {
     setLoading(true);
-    // Note: In strict mode, double invocation might cause duplicate appends if not careful.
-    // For production, we'd use a dedicated library like TanStack Query.
 
-    // Check if we are already loading to prevent race conditions (simple check)
-    // Actually, `loading` state updates are async, so we might need a ref or better logic.
-    // simpler: rely on `useEffect` deps or manual calls.
+    // Call API with limit, token, and search
+    // Using explicit URL construction here, or better use the service we defined.
+    // Let's use the service if imported, but for now matching existing pattern in App.tsx
+    // actually, let's fix the fetch call to match the backend expectation
 
-    fetch(`http://localhost:8080/api/musictrack?limit=20${token ? `&nextToken=${token}` : ''}${query ? `&search=${encodeURIComponent(query)}` : ''}`)
+    const params = new URLSearchParams();
+    params.append('limit', '20');
+    if (token) params.append('nextToken', token);
+    if (query) params.append('search', query);
+
+    fetch(`http://localhost:8080/api/musictrack?${params.toString()}`)
       .then(res => res.json())
       .then(data => {
         setSongs(prev => {
@@ -80,6 +70,12 @@ function MusifyApp() {
     setNextToken(null);
     setHasMore(true);
     fetchSongs(null, '');
+  };
+
+  const loadMore = () => {
+    if (nextToken) {
+      fetchSongs(nextToken, searchQuery);
+    }
   };
 
   return (
@@ -131,15 +127,18 @@ function MusifyApp() {
 
         {/* Grid Layout */}
         <div className="song-grid">
-          {songs.map((song, index) => {
-            if (songs.length === index + 1) {
-              return <div ref={lastSongElementRef} key={song.s3Key}><SongCard track={song} /></div>
-            } else {
-              return <SongCard key={song.s3Key} track={song} />
-            }
-          })}
+          {songs.map((song) => (
+            <SongCard key={song.s3Key} track={song} />
+          ))}
+        </div>
 
-          {loading && <p className="text-secondary">Loading...</p>}
+        <div className="d-flex justify-content-center mt-4 mb-4">
+          {loading && <div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div>}
+          {!loading && hasMore && (
+            <button className="btn btn-outline-primary rounded-pill px-4" onClick={loadMore}>
+              Load More
+            </button>
+          )}
           {!loading && songs.length === 0 && <p className="text-secondary">No songs found.</p>}
         </div>
       </div>
