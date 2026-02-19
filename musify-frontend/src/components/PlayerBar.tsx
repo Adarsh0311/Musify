@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { usePlayer } from '../context/PlayerContext';
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 // import '../App.css'; 
 
 export function PlayerBar() {

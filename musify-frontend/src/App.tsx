@@ -45,7 +45,7 @@ function MusifyApp() {
     if (token) params.append('nextToken', token);
     if (query) params.append('search', query);
 
-    fetch(`http://localhost:8080/api/musictrack?${params.toString()}`)
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/api/musictrack?${params.toString()}`)
       .then(res => res.json())
       .then(data => {
         setSongs(prev => {

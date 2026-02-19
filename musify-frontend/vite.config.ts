@@ -15,4 +15,7 @@ export default defineConfig({
       protocolImports: true,
     }),
   ],
+  preview: {
+    port: 5173,
+  },
 })

@@ -16,3 +16,4 @@ musify-frontend/node_modules/
 musify-frontend/dist/
 musify-frontend/build/
 musify-frontend/.env.local
+musify-frontend/.env.production

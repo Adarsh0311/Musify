@@ -1,0 +1,11 @@
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 300
+      MemorySize: 2304
+      Handler: com.musify.api.StreamLambdaHandler
+      CodeUri: D:\latest workspace\Projects\Musify\musify-backend
+      Runtime: java21
+      Architectures:
+        - x86_64

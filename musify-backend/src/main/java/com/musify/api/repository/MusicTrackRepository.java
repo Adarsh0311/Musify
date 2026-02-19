@@ -4,6 +4,9 @@ import com.musify.api.dto.PaginatedResponse;
 import com.musify.api.model.MusicTrack;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
@@ -17,9 +20,12 @@ import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class MusicTrackRepository {
     private final DynamoDbEnhancedClient dynamoDbEnhancedClient;
     private DynamoDbTable<MusicTrack> musicTrackTable;
+    private static final Logger logger = LoggerFactory.getLogger(MusicTrackRepository.class);
+
 
     @PostConstruct
     public void init() {
@@ -44,6 +50,10 @@ public class MusicTrackRepository {
     }
 
     public PaginatedResponse findAll(int limit, String nextToken, String searchQuery) {
+        log.info("Fetching songs from DynamoDB...");
+        List<MusicTrack> items = new ArrayList<>();
+        String newNextToken = null;
+        try {
         ScanEnhancedRequest.Builder requestBuilder = ScanEnhancedRequest.builder().limit(limit);
 
         // 1. Handle Pagination (NextToken)
@@ -88,8 +98,7 @@ public class MusicTrackRepository {
          */
         Iterator<Page<MusicTrack>> iterator = musicTrackTable.scan(requestBuilder.build()).iterator();
 
-        List<MusicTrack> items = new ArrayList<>();
-        String newNextToken = null;
+
 
         if (iterator.hasNext()) {
             Page<MusicTrack> page = iterator.next();
@@ -104,6 +113,9 @@ public class MusicTrackRepository {
                     newNextToken = Base64.getEncoder().encodeToString(rawToken.getBytes());
                 }
             }
+        }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
 
         return new PaginatedResponse(items, newNextToken);

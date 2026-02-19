@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { PlayerBar } from '../PlayerBar';
 import { Home, Search, Library, PlusSquare, Heart, Music } from 'lucide-react';
 import '../../App.css'; // Ensure CSS is imported

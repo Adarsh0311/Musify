@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { MusicTrack } from '../types';
 
 interface PlayerContextType {
@@ -19,7 +19,7 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     async function playTrack(track: MusicTrack) {
         try {
             // In a real scenario, we might want to cache this or handle it more robustly
-            const response = await fetch(`http://localhost:8080/api/musictrack/stream?key=${encodeURIComponent(track.s3Key)}`);
+            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/musictrack/stream?key=${track.s3Key}`);
 
             if (!response.ok) {
                 throw new Error('Failed to get presigned URL');
