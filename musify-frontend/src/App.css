@@ -1,4 +1,4 @@
-/* Layout & General */
+/* ===== APP SHELL ===== */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -8,72 +8,10 @@
   overflow: hidden;
 }
 
-.main-wrapper {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  height: calc(100vh - 90px);
-  /* Height minus player bar */
-}
-
-/* Sidebar */
-.sidebar {
-  width: 250px;
-  background-color: var(--color-bg-secondary);
-  /* White sidebar */
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  border-right: 1px solid var(--color-border);
-}
-
-.sidebar-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 24px;
-  font-weight: bold;
-  color: var(--color-text-primary);
-  margin-bottom: 20px;
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-  padding: 8px 0;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.nav-link:hover,
-.nav-link.active {
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-elevated);
-  border-radius: 4px;
-  padding: 8px 12px;
-}
-
-.nav-link.active {
-  background-color: var(--color-bg-elevated);
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-weight: 600;
-}
-
-/* Main Content Area */
 .main-content {
   flex: 1;
   background-color: var(--color-bg-primary);
-  /* Use variable */
-  margin: 0;
-  padding: 8px;
   overflow-y: auto;
-  position: relative;
-  /* Hide scrollbar for cleaner look */
   scrollbar-width: none;
 }
 
@@ -81,23 +19,37 @@
   display: none;
 }
 
-/* Header */
+/* ===== HEADER / NAVBAR ===== */
 .app-header {
   position: sticky;
   top: 0;
-  background-color: rgba(245, 245, 245, 0.9);
-  /* Translucent light gray */
+  background-color: rgba(245, 245, 245, 0.92);
   backdrop-filter: blur(8px);
-  padding: 16px 24px;
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--color-border);
+  padding: 10px 20px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 12px;
   z-index: 100;
 }
 
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
 .search-container {
+  flex: 1;
   position: relative;
-  margin-left: 20px;
+  max-width: 380px;
 }
 
 .search-input {
@@ -105,13 +57,16 @@
   border: 1px solid var(--color-border);
   border-radius: 500px;
   color: var(--color-text-primary);
-  padding: 12px 20px 12px 48px;
-  width: 300px;
+  padding: 10px 20px 10px 44px;
+  width: 100%;
   font-size: 14px;
+  font-family: var(--font-family);
+  transition: border-color 0.2s;
 }
 
 .search-input:focus {
   outline: 2px solid var(--color-accent);
+  outline-offset: -1px;
 }
 
 .search-icon {
@@ -120,73 +75,105 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--color-text-secondary);
+  pointer-events: none;
 }
 
-/* Song Grid */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ===== CONTENT AREA ===== */
 .content-padding {
-  padding: 0 24px 96px 24px;
-  /* Bottom padding for player bar space if needed */
+  padding: 24px 20px 100px 20px;
 }
 
 .section-title {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
   color: var(--color-text-primary);
 }
 
+/* ===== SONG GRID ===== */
 .song-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
 }
 
-/* Song Card */
+@media (min-width: 480px) {
+  .song-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .song-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .content-padding {
+    padding: 24px 28px 100px 28px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .song-grid {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+}
+
+/* ===== SONG CARD ===== */
 .song-card {
   background-color: var(--color-bg-secondary);
-  padding: 16px;
+  padding: 14px;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  /* Subtle shadow for light mode visibility */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .song-card:hover {
   background-color: var(--color-bg-elevated);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 .art-placeholder {
   width: 100%;
-  aspect-ratio: 1/1;
+  aspect-ratio: 1 / 1;
   background: linear-gradient(135deg, #ddd, #bbb);
-  /* Lighter placeholder */
   border-radius: 4px;
-  margin-bottom: 16px;
-  position: relative;
+  margin-bottom: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
 }
 
 .play-overlay-btn {
   position: absolute;
   bottom: 8px;
   right: 8px;
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background-color: var(--color-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transform: translateY(8px);
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(6px);
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .song-card:hover .play-overlay-btn {
@@ -195,8 +182,9 @@
 }
 
 .song-title {
+  font-size: 13px;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -204,92 +192,89 @@
 }
 
 .artist-name {
-  font-size: 0.875rem;
+  font-size: 12px;
   color: var(--color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-
-/* Player Bar */
+/* ===== PLAYER BAR ===== */
 .player-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 90px;
+  height: 86px;
   background-color: var(--color-bg-secondary);
   border-top: 1px solid var(--color-border);
-  padding: 0 16px;
   display: grid;
-  grid-template-columns: auto 3fr;
+  grid-template-columns: 1fr auto;
   align-items: center;
+  padding: 0 16px;
+  gap: 12px;
   z-index: 1000;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+}
+
+@media (min-width: 640px) {
+  .player-bar {
+    grid-template-columns: 1fr 2fr 1fr;
+    padding: 0 24px;
+  }
 }
 
 .track-info {
   display: flex;
   align-items: center;
-  gap: 14px;
-  max-width: 40vw;
-}
-
-.song-info {
-  overflow-wrap: anywhere;
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-100%);
-  }
+  gap: 12px;
+  min-width: 0;
 }
 
 .track-art-small {
-  min-width: 56px;
-  height: 56px;
+  min-width: 52px;
+  height: 52px;
   background-color: #ddd;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
+.song-info {
+  min-width: 0;
+}
 
 .player-controls {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .control-buttons {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 20px;
 }
 
 .play-pause-btn {
   background-color: var(--color-text-primary);
   color: var(--color-bg-primary);
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  transform: scale(1);
+  cursor: pointer;
   transition: transform 0.1s;
 }
 
 .play-pause-btn:hover {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 
 .icon-btn {
@@ -297,6 +282,8 @@
   border: none;
   color: var(--color-text-secondary);
   cursor: pointer;
+  display: flex;
+  padding: 4px;
 }
 
 .icon-btn:hover {
@@ -305,7 +292,7 @@
 
 .progress-container {
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -316,27 +303,35 @@
 .progress-bar {
   flex: 1;
   height: 5px;
-  /* Lighter gray track */
-  border-radius: 2px;
+  border-radius: 4px;
+  background-color: #d1c7c7;
+  cursor: pointer;
   position: relative;
-  background-color: rgb(209, 199, 199) !important;
 }
 
 .progress-fill {
-  width: 0%;
   height: 100%;
   background-color: var(--color-text-secondary);
-  /* Darker fill */
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 .progress-container:hover .progress-fill {
   background-color: var(--color-accent);
 }
 
-.volume-controls {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
+/* ===== MOBILE RESPONSIVE TWEAKS ===== */
+@media (max-width: 479px) {
+  .header-brand span {
+    display: none;
+  }
+
+  /* Hide "Musify" text, keep icon */
+  .upload-btn-label {
+    display: none;
+  }
+
+  /* Icon only on tiny screens */
+  .search-container {
+    max-width: none;
+  }
 }

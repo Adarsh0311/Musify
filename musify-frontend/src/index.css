@@ -1,21 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 :root {
-  /* Off-white / Grayish Theme */
+  /* Original off-white/grayish theme */
   --color-bg-primary: #f5f5f5;
-  /* Light Gray Main Background */
   --color-bg-secondary: #ffffff;
-  /* White Sidebar/Cards */
   --color-bg-elevated: #e0e0e0;
-  /* Slightly darker for inputs/hovers */
   --color-accent: #1db954;
-  /* Keep Green Accent */
   --color-accent-hover: #1ed760;
   --color-text-primary: #121212;
-  /* Dark Text */
   --color-text-secondary: #555555;
-  /* Gray Text */
   --color-border: #d1d1d1;
-  /* Light Gray Borders */
-
   --font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
@@ -25,17 +19,22 @@
   padding: 0;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   font-family: var(--font-family);
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -43,10 +42,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 5px;
+  background: #aaa;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #777;
+  background: #888;
 }
